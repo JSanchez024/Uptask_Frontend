@@ -10,9 +10,10 @@ export default function AppLayout() {
                <div className="w-64">
                     <Logo />
                </div>
+               
+            <NavMenu />
             </div>
 
-            <NavMenu />
 
         </header>
 
