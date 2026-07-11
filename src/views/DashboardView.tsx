@@ -1,6 +1,12 @@
 import { Link } from "react-router-dom"
+import { useQuery } from "@tanstack/react-query"
 
 export default function DashboardView() {
+
+  const { } = useQuery({
+    queryKey: ['projects']
+  })
+
   return (
     <>
       <h1 className="text-5xl font-black">Mis Proyectos</h1>
