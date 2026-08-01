@@ -65,7 +65,7 @@ export default function AddTaskModal() {
                                     <form
                                         className='mt-10 space-y-3'
                                         onSubmit={handleSubmit(handleCreateTask)}
-                                        noValidate
+                                        
                                     >
 
                                         <TaskForm 
