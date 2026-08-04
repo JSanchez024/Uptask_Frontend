@@ -1,32 +1,59 @@
 import { Fragment } from 'react';
 import { Dialog, Transition } from '@headlessui/react';
-import { useLocation } from 'react-router-dom';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
+import { useMutation } from '@tanstack/react-query';
 import TaskForm from './TaskForm';
 import type { TaskFormData } from '@/types/index';
+import { createTask } from '@/api/TaskAPI';
+import { toast } from 'react-toastify';
 
 export default function AddTaskModal() {
 
-    const navigate = useNavigate();
-    const location = useLocation();
-    const show = location.search.includes('newTask');
+    const navigate = useNavigate()
+
+    //Leer si modal existe
+    const location = useLocation()
+    const queryParams = new URLSearchParams(location.search)
+    const modalTask = queryParams.get('newTask')
+    const show = modalTask ? true : false 
+    
+    //Obtener projectId
+    const params = useParams()
+    const projectId = params.projectId!
+    
 
     const initialValues : TaskFormData = {
         name: '',
         description: ''   
     }
-    const { register, handleSubmit, formState: {errors}} = useForm({defaultValues : initialValues})
+    const { register, handleSubmit, reset, formState: {errors}} = useForm({defaultValues : initialValues})
+
+    const { mutate } = useMutation({
+        mutationFn: createTask,
+        onError: (error) => {
+            toast.error(error.message)
+        },
+        onSuccess: (data) => {
+            toast.success(data)
+            reset()
+            navigate(location.pathname, {replace: true})
+        }
+    })
 
     const handleCreateTask = (formData: TaskFormData) => {
-        console.log(formData)
+        const data = {
+            formData,
+            projectId
+        }
+        mutate(data)
     }
 
 
     return (
         <>
             <Transition appear show={show} as={Fragment}>
-                <Dialog as="div" className="relative z-10" onClose={() => navigate('', {replace: true})}>
+                <Dialog as="div" className="relative z-10" onClose={() => navigate(location.pathname, {replace: true})}>
                     <Transition.Child
                         as={Fragment}
                         enter="ease-out duration-300"
@@ -65,7 +92,7 @@ export default function AddTaskModal() {
                                     <form
                                         className='mt-10 space-y-3'
                                         onSubmit={handleSubmit(handleCreateTask)}
-                                        
+                                        noValidate
                                     >
 
                                         <TaskForm 
