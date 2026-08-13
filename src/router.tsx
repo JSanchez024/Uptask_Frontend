@@ -4,6 +4,10 @@ import DashboardView from '@/views/DashboardView'
 import CreateProjectView from './views/project/CreateProjectView'
 import EditProjectView from './views/project/EditProjectView'
 import ProjectDetailsView from './views/project/ProjectDetailsView'
+import AuthLayout from './layouts/AuthLayout'
+import LoginView from './views/auth/LoginView'
+import RegisterView from './views/auth/RegisterView'
+import ConfirmAccountView from './views/auth/ConfirmAccountView'
 
 export default function Router(){
 
@@ -16,10 +20,14 @@ export default function Router(){
                     <Route path='/projects/create' element={<CreateProjectView />} index />
                     <Route path='/projects/:projectId' element={<ProjectDetailsView />} index />
                     <Route path='/projects/:projectId/edit' element={<EditProjectView />} index />
+                </Route>
 
+                <Route element={<AuthLayout/>}>
+                    <Route path='/auth/login' element={<LoginView/>} />
+                    <Route path='/auth/register' element={<RegisterView/>} />
+                    <Route path='/auth/confirm-account' element={<ConfirmAccountView/>} />
                 </Route>
             </Routes>
-        
         </BrowserRouter>
     )
     

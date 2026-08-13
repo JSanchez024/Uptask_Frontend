@@ -1,5 +1,23 @@
 import { z } from "zod"
 
+//Auth & Users
+const authSchema = z.object({
+    name: z.string(),
+    email: z.email(),
+    password: z.string(),
+    password_confirmation: z.string(),
+    token: z.string()
+}).refine((data) => data.password === data.password_confirmation, {
+    message: "Las contraseñas no coinciden",
+    path: ["password_confirmation"]
+});
+
+type Auth = z.infer<typeof authSchema>
+export type UserLoginForm = Pick<Auth, 'email' | 'password'>
+export type UserRegistrationForm = Pick<Auth, 'name' | 'email' | 'password' | 'password_confirmation'>
+
+export type ConfirmToken = Pick<Auth, 'token'>
+
 //Tasks
 export const taskStatusSchema = z.enum(["pending" , "onHold" , "inProgress" , "underReview" , "completed" ])
 export type TaskStatus = z.infer<typeof taskStatusSchema>
