@@ -1,16 +1,29 @@
 import { z } from "zod"
 
 //Auth & Users
-const authSchema = z.object({
+const baseAuthSchema = z.object({
     name: z.string(),
-    email: z.email(),
+    email: z.string().email(), // NOTA: en zod es z.string().email()
     password: z.string(),
     password_confirmation: z.string(),
     token: z.string()
-}).refine((data) => data.password === data.password_confirmation, {
+});
+
+// 2. Aplicamos el refine ÚNICAMENTE para la validación de autenticación/registro
+export const authSchema = baseAuthSchema.refine((data) => data.password === data.password_confirmation, {
     message: "Las contraseñas no coinciden",
     path: ["password_confirmation"]
 });
+//const authSchema = z.object({
+//    name: z.string(),
+//    email: z.email(),
+//    password: z.string(),
+//    password_confirmation: z.string(),
+//    token: z.string()
+//}).refine((data) => data.password === data.password_confirmation, {
+//    message: "Las contraseñas no coinciden",
+//    path: ["password_confirmation"]
+//});
 
 type Auth = z.infer<typeof authSchema>
 export type UserLoginForm = Pick<Auth, 'email' | 'password'>
@@ -18,8 +31,17 @@ export type UserRegistrationForm = Pick<Auth, 'name' | 'email' | 'password' | 'p
 export type RequestConfirmationCodeForm = Pick<Auth, 'email' >
 export type ForgotPasswordForm = Pick<Auth, 'email' >
 export type NewPasswordForm = Pick<Auth, 'password' | 'password_confirmation' >
-
 export type ConfirmToken = Pick<Auth, 'token'>
+
+//Users
+export const userSchema = baseAuthSchema.pick({
+    name: true,
+    email: true
+}).extend({
+    _id: z.string()
+})
+export type User = z.infer<typeof userSchema>
+
 
 //Tasks
 export const taskStatusSchema = z.enum(["pending" , "onHold" , "inProgress" , "underReview" , "completed" ])
@@ -61,3 +83,13 @@ export const dashboardProjectSchema = z.array(
 
 export type Project = z.infer<typeof projectSchema>
 export type ProjectFormData = Pick<Project, 'clientName' | 'projectName' | 'description' >
+
+
+//Team
+const teamMemberSchema = userSchema.pick({
+    name: true,
+    email: true,
+    _id: true
+})
+export type TeamMember = z.infer<typeof teamMemberSchema>
+export type TeamMemberForm = Pick<TeamMember, 'email'>
