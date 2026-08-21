@@ -14,16 +14,6 @@ export const authSchema = baseAuthSchema.refine((data) => data.password === data
     message: "Las contraseñas no coinciden",
     path: ["password_confirmation"]
 });
-//const authSchema = z.object({
-//    name: z.string(),
-//    email: z.email(),
-//    password: z.string(),
-//    password_confirmation: z.string(),
-//    token: z.string()
-//}).refine((data) => data.password === data.password_confirmation, {
-//    message: "Las contraseñas no coinciden",
-//    path: ["password_confirmation"]
-//});
 
 type Auth = z.infer<typeof authSchema>
 export type UserLoginForm = Pick<Auth, 'email' | 'password'>
@@ -54,6 +44,11 @@ export const taskSchema = z.object({
     description: z.string(),
     project: z.string(),
     status: taskStatusSchema,
+    completedBy: z.array(z.object({
+        _id: z.string(),
+        user:  userSchema,
+        status: taskStatusSchema
+    })),
     createdAt: z.string(),
     updatedAt: z.string()
 })
@@ -69,6 +64,10 @@ export const projectSchema = z.object({
     projectName: z.string(),
     clientName: z.string(),
     description: z.string(),
+    manager: z.union([
+        z.string(),
+            userSchema.pick({_id: true})
+    ]) 
 })
 
 
@@ -77,7 +76,8 @@ export const dashboardProjectSchema = z.array(
         _id: true,
         projectName: true,
         clientName: true,
-        description: true
+        description: true,
+        manager: true
     })
 )
 
